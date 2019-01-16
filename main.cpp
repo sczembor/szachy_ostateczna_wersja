@@ -1,6 +1,6 @@
 /** @file */
 //  main.cpp
-//  szachy_ostateczna wersja
+//  Szachy
 //
 //  Created by Stanislaw Czembor on 13/01/2019.
 //  Copyright © 2019 Stanislaw Czembor. All rights reserved.
