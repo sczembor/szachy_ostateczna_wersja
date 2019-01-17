@@ -13,7 +13,7 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
-void wyswietl_szachownice(char tab[][8],const int ROZMIAR)
+void wyswietl_szachownice(char tab[][8],const int ROZMIAR,int kolor)
 {
     int indeks_literowy = 8;
     std::cout<<"        A      B      C      D      E      F      G      H   "<<std::endl;
@@ -35,8 +35,12 @@ void wyswietl_szachownice(char tab[][8],const int ROZMIAR)
         
     }
     std::cout<<"     #########################################################"<<std::endl<<std::endl<<std::endl;
-    
-    
+    menu2();
+    if(!kolor)
+        
+        std::cout<<"----------------------------Ruch bialych-------------------------"<<std::endl;
+    else
+        std::cout<<"----------------------------Ruch czarnych-------------------------"<<std::endl;
 }
 
 
@@ -65,34 +69,86 @@ void reset_szachownicy(char tab[][8],const int ROZMIAR)
         for(int j = 0; j < 8; j++)
             tab[i][j] = ' ';
 }
-void gra(struct ruch * &pHead, struct ruch *&pTail,int kolor,char tab[][8])
+void gra(int &koniec, struct ruch * &pHead, struct ruch *&pTail,int &kolor,char tab[][8])
 {
     std::string ruch;
     int poprawny1=0;
     int poprawny2=0;
-    if(!kolor)
-        std::cout<<"------------------Ruch bialych------------------"<<std::endl;
-    else
-        std::cout<<"------------------Ruch czarnych------------------"<<std::endl;
-    std::cout<<"wprowadz ruch(np.a4-a6 lub m, żeby przejsc do menu): ";
-    std::cin>>ruch;
-    std::cout<<std::endl;
-    if(ruch.length()==5 or ruch.length()==3)//upewnenie sie, ze ruch wprowadzony przez uzytkownika ma dokladnie 5 lub 3 znakow, aby uniknac chodzenia po obcej pamieci
-    {
-        poprawny1 = czy_poprawny_pionek(ruch, kolor, tab);
-        poprawny2 = ruchy(pHead,pTail,ruch, kolor, tab);
-    }
+    int szachowanie = 0;
+    szachowanie = szachowanie_krola(pHead, pTail, kolor, tab);
+    czyszczenie_ekranu();
+    wyswietl_szachownice(tab, 8, kolor);
+    if(szachowanie==1)
+        std::cout<<"CZARNY KROL JEST SZACHOWANY!"<<std::endl;
+    else if (szachowanie==2)
+        std::cout<<"BIALY KROL JEST SZACHOWANY!"<<std::endl;
     while(!(poprawny1 and poprawny2))
     {
-        std::cout<<"niepoprawny ruch, sprobuj ponownie : ";
+        std::cout<<"wprowadz ruch(np. a4-a6, 2, o-o): ";
         std::cin>>ruch;
-        if(ruch.length()==5 or ruch.length()==3)
+        poprawny1=0;
+        poprawny2=0;
+        std::cout<<std::endl;
+        if(ruch.length()==1)
         {
-                poprawny1 = czy_poprawny_pionek(ruch, kolor, tab);
-                poprawny2 = ruchy(pHead,pTail,ruch, kolor, tab);
+            switch(ruch[0])
+            {
+                case '1'://zapisz i zakoncz
+                {
+                    std::ofstream plikWy("zapis_parti",std::ios::app);
+                    if(plikWy)
+                    {
+                        wypisz_od_poczatku(pHead,plikWy);
+                        plikWy.close();
+                    }
+                    else
+                        std::cout<<"nie udalo sie otworzyc pliku zapis_parti!"<<std::endl;
+                    usun_liste(pHead);
+                    pHead=nullptr;
+                    pTail=nullptr;
+                    czyszczenie_ekranu();
+                    koniec =0;
+                    poprawny1 =1;
+                    poprawny2 =1;
+                    break;
+                }
+                case '2'://zakoncz bez zapisywania
+                {
+                    usun_liste(pHead);
+                    pHead=nullptr;
+                    pTail=nullptr;
+                    czyszczenie_ekranu();
+                    koniec =0;
+                    poprawny1 =1;
+                    poprawny2 =1;
+                    break;
+                }
+                default:
+                    break;
+            }
         }
+        else
+        {
+            if(ruch.length()==5 or ruch.length()==3)//upewnenie sie, ze ruch wprowadzony przez uzytkownika ma dokladnie 5 lub 3 znakow, aby uniknac chodzenia po obcej pamieci
+            {
+                poprawny1 = czy_poprawny_pionek(ruch, kolor, tab);
+                    if(poprawny1)
+                    {
+                        poprawny2 = ruchy(pHead,pTail,ruch, kolor, tab);
+                        if(poprawny2)
+                        {
+                            dodaj_na_koniec(pHead, pTail, ruch);
+                            if(kolor==0)
+                                kolor =1;
+                            else
+                                kolor =0;
+                        }
+                    }
+            }
+        }
+        czyszczenie_ekranu();
+        wyswietl_szachownice(tab, 8, kolor);
     }
-        dodaj_na_koniec(pHead, pTail, ruch);
 }
 int czy_poprawny_pionek(std::string ruch,int kolor,char tab[][8])
 {
@@ -102,16 +158,19 @@ int czy_poprawny_pionek(std::string ruch,int kolor,char tab[][8])
     if(ruch == roszada_krotka or ruch==roszada_dluga)
         return 1;
     else if(kolor==1)
+    {
         if(65<(tab[7-(skad[1]-49)][skad[0]-97]) and (tab[7-(skad[1]-49)][skad[0]-97])<90)
             return 1;
         else
             return 0;
+    }
     if(kolor==0)
+    {
         if(96<(tab[7-(skad[1]-49)][skad[0]-97]) and (tab[7-(skad[1]-49)][skad[0]-97])<122)
             return 1;
         else
             return 0;
-    
+    }
     return 0;
 }
 int ruch_pionek_bialy(int kolor,std::string ruch, char tab[][8])
@@ -266,33 +325,38 @@ int ruch_wieza(std::string ruch,int kolor, char tab[][8])
         
         
     }
-    if(kolor)
+    if(docelowy_wiersz==poczatkowy_wiersz or docelowy_kolumna==poczatkowy_kolumna)
     {
-        if(poprawny and (tab[docelowy_wiersz][docelowy_kolumna]==' ' or islower(tab[docelowy_wiersz][docelowy_kolumna])))
+        if(kolor)
         {
-            tab[docelowy_wiersz][docelowy_kolumna]=tab[poczatkowy_wiersz][poczatkowy_kolumna];
-            tab[poczatkowy_wiersz][poczatkowy_kolumna]=' ';
-            return 1;
+            if(poprawny and (tab[docelowy_wiersz][docelowy_kolumna]==' ' or islower(tab[docelowy_wiersz][docelowy_kolumna])))
+            {
+                tab[docelowy_wiersz][docelowy_kolumna]=tab[poczatkowy_wiersz][poczatkowy_kolumna];
+                tab[poczatkowy_wiersz][poczatkowy_kolumna]=' ';
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+            
         }
         else
         {
-            return 0;
+            if(poprawny and (tab[docelowy_wiersz][docelowy_kolumna]==' ' or isupper(tab[docelowy_wiersz][docelowy_kolumna])))
+            {
+                tab[docelowy_wiersz][docelowy_kolumna]=tab[poczatkowy_wiersz][poczatkowy_kolumna];
+                tab[poczatkowy_wiersz][poczatkowy_kolumna]=' ';
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
         }
-        
     }
     else
-    {
-        if(poprawny and (tab[docelowy_wiersz][docelowy_kolumna]==' ' or isupper(tab[docelowy_wiersz][docelowy_kolumna])))
-        {
-            tab[docelowy_wiersz][docelowy_kolumna]=tab[poczatkowy_wiersz][poczatkowy_kolumna];
-            tab[poczatkowy_wiersz][poczatkowy_kolumna]=' ';
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
+        return 0;
 }
 int ruch_skoczek(std::string ruch,int kolor, char tab[][8])
 {
@@ -396,33 +460,38 @@ int ruch_goniec(std::string ruch,int kolor, char tab[][8])
                 break;
         }
     }
-    if(kolor)
-    {
-        if(poprawny and (tab[docelowy_wiersz][docelowy_kolumna]==' ' or islower(tab[docelowy_wiersz][docelowy_kolumna])))
+    if(abs(docelowy_wiersz-poczatkowy_wiersz)==abs(docelowy_kolumna-poczatkowy_kolumna))
+       {
+        if(kolor)
         {
-            tab[docelowy_wiersz][docelowy_kolumna]=tab[poczatkowy_wiersz][poczatkowy_kolumna];
-            tab[poczatkowy_wiersz][poczatkowy_kolumna]=' ';
-            return 1;
+            if(poprawny and (tab[docelowy_wiersz][docelowy_kolumna]==' ' or islower(tab[docelowy_wiersz][docelowy_kolumna])))
+            {
+                tab[docelowy_wiersz][docelowy_kolumna]=tab[poczatkowy_wiersz][poczatkowy_kolumna];
+                tab[poczatkowy_wiersz][poczatkowy_kolumna]=' ';
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+            
         }
         else
         {
-            return 0;
+            if(poprawny and (tab[docelowy_wiersz][docelowy_kolumna]==' ' or isupper(tab[docelowy_wiersz][docelowy_kolumna])))
+            {
+                tab[docelowy_wiersz][docelowy_kolumna]=tab[poczatkowy_wiersz][poczatkowy_kolumna];
+                tab[poczatkowy_wiersz][poczatkowy_kolumna]=' ';
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
         }
-        
-    }
-    else
-    {
-        if(poprawny and (tab[docelowy_wiersz][docelowy_kolumna]==' ' or isupper(tab[docelowy_wiersz][docelowy_kolumna])))
-        {
-            tab[docelowy_wiersz][docelowy_kolumna]=tab[poczatkowy_wiersz][poczatkowy_kolumna];
-            tab[poczatkowy_wiersz][poczatkowy_kolumna]=' ';
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
+       }
+       else
+           return 0;
 }
 int ruch_hetman(std::string ruch,int kolor, char tab[][8])
 {
@@ -430,7 +499,9 @@ int ruch_hetman(std::string ruch,int kolor, char tab[][8])
     std::string dokad = ruch.substr(3,5);
     int poczatkowy_kolumna = skad[0]-97;
     int docelowy_kolumna = dokad[0]-97;
-    if(poczatkowy_kolumna==docelowy_kolumna)
+    int poczatkowy_wiersz = 7-(skad[1]-49);
+    int docelowy_wiersz = 7-(dokad[1]-49);
+    if(poczatkowy_kolumna==docelowy_kolumna or poczatkowy_wiersz==docelowy_wiersz)
         return ruch_wieza(ruch, kolor, tab);
     else
         return ruch_goniec(ruch, kolor,tab);
@@ -518,7 +589,7 @@ int rooszada_dluga(struct ruch * &pHead, struct ruch *&pTail,int kolor, char tab
         dodaj_na_koniec(pHead, pTail, "a1-d1");
         return 1;
     }
-    else if(!kolor and tab[0][4]=='K' and tab[0][3]==' ' and tab[0][0]==' ' and tab[0][1]==' ' and tab[0][0]=='W')
+    else if(kolor and tab[0][4]=='K' and tab[0][3]==' ' and tab[0][2]==' ' and tab[0][1]==' ' and tab[0][0]=='W')
     {
         tab[0][0]=' ';
         tab[0][1]=' ';
@@ -593,7 +664,7 @@ void czyszczenie_ekranu()
 }
 int zakonczenie_gry(int kolor, char tab[][8])
 {
-    if(!kolor)
+    if(kolor)
     {
         for(int i = 0; i<8;i++)
         {
@@ -669,16 +740,102 @@ void odczytywanie_z_pliku(int &kolor,std::istream & ss,char tab [][8])
         
     }
 }
+void menu2()
+{   std::cout<<std::setw(5)<<"---------MENU GRY---------"<<std::endl;
+    std::cout<<"1.ZAPISZ I ZAKONCZ"<<std::endl;
+    std::cout<<"2.ZAKONCZ BEZ ZAPISYWANIA"<<std::endl;
+}
 void menu1()
 {
+    std::cout<<std::setw(5)<<"----MENU----"<<std::endl;
     std::cout<<std::setw(5)<<"1.NOWA GRA"<<std::endl;
     std::cout<<"2.GRA Z PLIKU"<<std::endl;
-    std::cout<<"3.ZAPISZ I ZAKONCZ"<<std::endl;
-    std::cout<<"4.ZAKONCZ BEZ ZAPISYWANIA"<<std::endl;
-    std::cout<<"5.KONTYNUUJ"<<std::endl;
 }
-void menu2()
+int szachowanie_krola(struct ruch * & pHead, struct ruch * & pTail,int kolor, char tab[][8])
 {
-    std::cout<<std::setw(5)<<"1.NOWA GRA"<<std::endl;
-    std::cout<<"2.GRA Z PLIKU"<<std::endl;
+    std::string polozenie_krol = znajdz_polozenie_krola(kolor, tab);
+    std::string ruch_sprawdzajacy;
+    int szachowanie = 0;
+    for(int a = 0; a<8; a++)
+    {
+        for(int b = 0; b<8; b++)
+        {
+            
+            if(kolor and islower(tab[a][b]))
+            {
+                char tmp = tab[a][b];
+                std::string cyfra = std::to_string(8-a);
+                char c = b+97;
+                std::string ruch_sprawdzajacy = c+cyfra+'-'+polozenie_krol;
+                szachowanie = ruchy(pHead,pTail,ruch_sprawdzajacy, !kolor, tab);
+                if(szachowanie)
+                {
+                    std::string skad = ruch_sprawdzajacy.substr(0,2);
+                    std::string dokad = ruch_sprawdzajacy.substr(3,5);
+                    int poczatkowy_wiersz = 7-(skad[1]-49);
+                    int docelowy_wiersz = 7-(dokad[1]-49);
+                    int poczatkowy_kolumna = skad[0]-97;
+                    int docelowy_kolumna = dokad[0]-97;
+                    tab[docelowy_wiersz][docelowy_kolumna]= 'K';//cofniecie ruchu
+                    tab[poczatkowy_wiersz][poczatkowy_kolumna] = tmp;
+                    return 1;
+                }
+            }
+            else if(!kolor and isupper(tab[a][b]))
+            {
+                char tmp = tab[a][b];
+                std::string cyfra = std::to_string(8-a);
+                char c = b+97;
+                std::string ruch_sprawdzajacy = c+cyfra+'-'+polozenie_krol;
+                szachowanie = ruchy(pHead,pTail,ruch_sprawdzajacy, !kolor, tab);
+                if(szachowanie)
+                {
+                    std::string skad = ruch_sprawdzajacy.substr(0,2);
+                    std::string dokad = ruch_sprawdzajacy.substr(3,5);
+                    int poczatkowy_wiersz = 7-(skad[1]-49);
+                    int docelowy_wiersz = 7-(dokad[1]-49);
+                    int poczatkowy_kolumna = skad[0]-97;
+                    int docelowy_kolumna = dokad[0]-97;
+                    tab[docelowy_wiersz][docelowy_kolumna]= 'k';//cofniecie ruchu
+                    tab[poczatkowy_wiersz][poczatkowy_kolumna] = tmp;
+                    return 2;
+                }
+            }
+        }
+    }
+    return 0;
+}
+std::string znajdz_polozenie_krola(int kolor, char tab[][8])
+{
+    if(kolor)
+    {
+        for(int a = 0; a<8; a++)
+        {
+            for(int b = 0; b<8; b++)
+            {
+                if(tab[a][b]=='K')//pozycja krola bialego
+                {
+                    std::string cyfra = std::to_string(8-a);
+                    char c = b+97;
+                    return std::string (c+cyfra);
+                }
+            }
+        }
+    }
+    else
+    {
+        for(int a = 0; a<8; a++)
+        {
+            for(int b = 0; b<8; b++)
+            {
+                if(tab[a][b]=='k')//pozycja krola czarnego
+                {
+                    std::string cyfra = std::to_string(8-a);
+                    char c = b+97;
+                    return std::string (c+cyfra);
+                }
+            }
+        }
+    }
+    return "0";
 }

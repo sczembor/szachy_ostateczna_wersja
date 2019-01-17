@@ -15,126 +15,82 @@
 #include "struktury.hpp"
 
 
-int kolor = 0;//kolor 0 to biale pionki
 
-int koniec =1;
-const int N = 8;
-char szachownica[N][N];
-std::string wybor;
 
 int main()
 {
-    struct ruch *pHead = nullptr;
-    struct ruch *pTail = nullptr;
+    int kolor = 0;//kolor 0 to biale pionki
+    int koniec =1;//jezeli zmienna przyjmuje wartosc jeden oznacza koniec gry
+    const int N = 8;//dlgusoc tablicy
+    char szachownica[N][N];//tablica przechowujaca figury na szachownicy
+    std::string wybor;//wybor w poczatkowym menu
+    struct ruch *pHead = nullptr; //wskaznik na glowe listy
+    struct ruch *pTail = nullptr; //wskaznik na ogon listy
     reset_szachownicy(szachownica, N);
     do
     {
-        menu2(); //wysweitla początkowe menu po otwarciu programu
+        czyszczenie_ekranu();
+        std::cout << "   _____ _    _ ______  _____ _____ \n  / ____| |  | |  ____|/ ____/ ____| \n | |    | |__| | |__  | (___| (___  \n | |    |  __  |  __|  \\___  \\___ \\ \n | |____| |  | | |____ ____) |___) | \n  \\_____|_|  |_|______|_____/_____/ \n" <<std::endl;
+        std::cout<<"WITAJ W GRZE SZACHY C++"<<std::endl;
+        std::cout<<"GRA STWORZONA PRZEZ STANISŁAWA CZEMBOR"<<std::endl<<std::endl<<std::endl<<std::endl<<std::endl;
+        menu1(); //wysweitla początkowe menu po otwarciu programu
         std::cout<<"wybor (np. 1) :";
         std::cin>>wybor;
     }while (wybor.length() != 1 and(wybor[0] != '1' or wybor[0] != '2'));
-    
-    do
+    switch (wybor[0])
     {
-            if(wybor.length()==1)
-            {
-                switch (wybor[0])
-                {
-                    case '5'://kontynuuj
-                    {
-                        gra(pHead,pTail,kolor,szachownica);
-                        koniec =zakonczenie_gry(kolor, szachownica);
-                        if(kolor==0)
-                            kolor =1;
-                        else
-                            kolor =0;
-                        czyszczenie_ekranu();//funkcja czyszcząca ekran
-                        if(!koniec)
-                        {
-                            if(kolor)
-                                std::cout<<"wygraly biale!"<<std::endl<<std::endl<<std::endl<<std::endl<<std::endl;
-                    
-                            else
-                                std::cout<<"wygraly czarne!"<<std::endl<<std::endl<<std::endl<<std::endl<<std::endl;
-                            std::ofstream plikWy("zapis_partii");
-                            if(plikWy)
-                            {
-                                wypisz_od_poczatku(pHead,plikWy);
-                                plikWy.close();
-                            }
-                            else
-                                std::cout<<"nie udalo sie otworzyc pliku zapis_partii!"<<std::endl;
-                            usun_liste(pHead);
-                            pHead=nullptr;
-                            pTail=nullptr;
-                        }
-                        break;
-                    }
-                    case '1'://nowa gra
-                    {
-                        reset_szachownicy(szachownica, N);
-                        usun_liste(pHead);
-                        pHead=nullptr;
-                        pTail=nullptr;
-                        czyszczenie_ekranu();
-                        std::ofstream plikWy("zapis_partii",std::ios::trunc);
-                        plikWy.close();
-                        break;
-                    }
-                    case '2'://gra z pliku
-                    {
-                        reset_szachownicy(szachownica, N);
-                        std::ifstream plikW("zapis_partii");
-                        if(plikW)
-                        {
-                            odczytywanie_z_pliku(kolor,plikW, szachownica);
-                            plikW.close();
-                        }
-                        else
-                            std::cout<<"nie udalo sie otworzyc pliku zapis_partii!"<<std::endl;
-                        czyszczenie_ekranu();
-                        break;
-                    }
-                    case '3'://zapisz i zakoncz
-                    {
-                        std::ofstream plikWy("zapis_partii",std::ios::app);
-                        if(plikWy)
-                        {
-                            wypisz_od_poczatku(pHead,plikWy);
-                            plikWy.close();
-                        }
-                        else
-                            std::cout<<"nie udalo sie otworzyc pliku zapis_partii!"<<std::endl;
-                        usun_liste(pHead);
-                        pHead=nullptr;
-                        pTail=nullptr;
-                        czyszczenie_ekranu();
-                        koniec =0;
-                        break;
-                    }
-                    case '4'://zakoncz bez zapisywania
-                    {
-                        koniec =0;
-                        usun_liste(pHead);
-                        pHead=nullptr;
-                        pTail=nullptr;
-                        czyszczenie_ekranu();
-                        break;
-                    }
-                        default:
-                        std::cout<<"wprowadzono niepoprawne dane, sprobuj ponownie: ";
-                        std::cin>>wybor;
-                        break;
-                }
-            }
+        case '1'://nowa gra
+        {
+            reset_szachownicy(szachownica, N);
+            usun_liste(pHead);
+            pHead=nullptr;
+            pTail=nullptr;
+            czyszczenie_ekranu();
+            std::ofstream plikWy("zapis_parti",std::ios::trunc);
+            plikWy.close();
+            break;
+        }
+        case '2'://gra z pliku
+        {
+        reset_szachownicy(szachownica, N);
+        std::ifstream plikW("zapis_parti");
+        if(plikW)
+        {
+            odczytywanie_z_pliku(kolor,plikW, szachownica);
+            plikW.close();
+        }
+        else
+            std::cout<<"nie udalo sie otworzyc pliku zapis_parti!"<<std::endl;
+        czyszczenie_ekranu();
+        break;
+                                }
+    }
+    while(koniec)
+    {
+        gra(koniec, pHead, pTail, kolor, szachownica);
         if(koniec)
         {
-            wyswietl_szachownice(szachownica, N);
-            menu1();
-            std::cout<<"wybor (np. 1) :";
-            std::cin>>wybor;
+            koniec =zakonczenie_gry(kolor, szachownica);
+            if(!koniec)
+            {
+                if(kolor)
+                {
+                    std::cout<<std::endl<<std::endl;
+                    std::cout<<"-----------------------WYGRALY BIALE GRATULACJE----------------------"<<std::endl<<std::endl<<std::endl;
+                }
+                else
+                {
+                    std::cout<<std::endl<<std::endl;
+                    std::cout<<"---------------------WYGRALY CZARNE GRATULACJE---------------------"<<std::endl<<std::endl<<std::endl;
+                }
+                usun_liste(pHead);
+                pHead=nullptr;
+                pTail=nullptr;
+                }
+            else
+                czyszczenie_ekranu();//funkcja czyszcząca ekran
         }
-    }while (koniec);
+    }
     
 
     return 0;

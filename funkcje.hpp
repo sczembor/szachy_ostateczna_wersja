@@ -14,19 +14,20 @@
  @param tab dwuwymiarowa tablica przechowujaca aktualne pozycje figur na szachownicy
  @param ROZMIAR parametr okreslajacy rozmiar tablicy
   */
-void wyswietl_szachownice(char tab[][8],const int ROZMIAR);
+void wyswietl_szachownice(char tab[][8],const int ROZMIAR, int kolor);
 /** Funckja resetujaca rozmieszczenie figur na szachownicy
  @param tab dwuwymiarowa tablica przechowujaca aktualne pozycje figur na szachownicy
  @param ROZMIAR parametr okreslajacy rozmiar tablicy
  */
 void reset_szachownicy(char tab[][8],const int ROZMIAR);//funkcja ustawia pionki na szachownicy w pozycji poczatkowej
-/** Funkcja proszaca gracza o wprowadzenie ruchu, wywolujaca inne funkcje sprawdzajace czy ruch jest poprawny
+/** Funkcja proszaca gracza o wprowadzenie ruchu lub pozycji z menu, wywolujaca inne funkcje sprawdzajace czy ruch jest poprawny, czy ktorys z kroli nie jest szachowany. Po poprawanie wykonanym ruchu, kolejka zostaje przekazna przeciwnikowi.
+ @param koniec zmienna przechowujaca informacje o tym czy gra zostala zakonczona
  @param pHead wskaznik na poczatek listy
  @param pTail wskaznik na koniec listy
  @param kolor kolor gracza, ktoremu jest przyznany ruch
  @param tab dwuwymiarowa tablica przechowujaca aktualne pozycje figur na szachownicy
  */
-void gra(struct ruch * & pHead, struct ruch * & pTail,int kolor,char tab[][8]);
+void gra(int &koniec, struct ruch * & pHead, struct ruch * & pTail,int &kolor,char tab[][8]);
 /** Funckja sprawdzajaca czy na wybranym polu znajduje sie twoj pionek
  @param ruch ruch wprowadzony przez gracza
  @param kolor kolor gracza, ktoremu jest przyznany ruch
@@ -123,12 +124,12 @@ void usun_liste(struct ruch *&pHead);
  @param tab dwuwymiarowa tablica przechowujaca aktualne pozycje figur na szachownicy
  */
 void odczytywanie_z_pliku(int &kolor,std::istream & ss,char tab [][8]);
-/** Funkcja wyswietlacja menu gry 
- */
-void menu1();
 /** Funkcja wyswietlacja menu gry
  */
 void menu2();
+/** Funkcja wyswietlacja poczatkowe menu gry
+ */
+void menu1();
 /** Funkcja wykonujaca roszade krtoka (o-o)
  @param pHead wskaznik na poczatek listy
  @param pTail wskaznik na koniec listy
@@ -145,4 +146,18 @@ int rooszada_krotka(struct ruch * &pHead, struct ruch *&pTail,int kolor, char ta
  @return zwraca 1 jezeli wykonano roszade, zwraca 0 gdy niewykonano
  */
 int rooszada_dluga(struct ruch * &pHead, struct ruch *&pTail,int kolor, char tab[][8]);
+/** Funkcja sprawdzająca czy krol przeciwnika jest szachowany, jezeli czarny krol jest szachowany zwraca wartosc 1, jezeli bialy wartosc 2, jezeli zaden wartosc 0.
+ @param pHead wskaznik na poczatek listy
+ @param pTail wskaznik na koniec listy
+ @param kolor kolor gracza, ktoremu jest przyznany ruch
+ @param tab dwuwymiarowa tablica przechowujaca aktualne pozycje figur na szachownicy
+ @return zwraca wartosc typu int w zaleznosci od wyniku
+ */
+int szachowanie_krola(struct ruch * & pHead, struct ruch * & pTail,int kolor, char tab[][8]); //funkcja zwraca jeden gdy krol jest szachowany
+/** Funckja wyszukujaca aktualne polozenie krola przeciwnika
+ @param kolor kolor gracza, ktoremu jest przyznany ruch
+ @param tab dwuwymiarowa tablica przechowujaca aktualne pozycje figur na szachownicy
+ @return zwraca string przechowujacy aktualne polozenie krola przeciwnika na szachownicy
+ */
+std::string znajdz_polozenie_krola(int kolor, char tab[][8]);
 #endif /* funkcje_hpp */
