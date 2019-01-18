@@ -74,16 +74,16 @@ void gra(int &koniec, struct ruch * &pHead, struct ruch *&pTail,int &kolor,char 
     std::string ruch;
     int poprawny1=0;
     int poprawny2=0;
-    int szachowanie = 0;
+    int szachowanie=0;
     szachowanie = szachowanie_krola(pHead, pTail, kolor, tab);
     czyszczenie_ekranu();
     wyswietl_szachownice(tab, 8, kolor);
-    if(szachowanie==1)
-        std::cout<<"CZARNY KROL JEST SZACHOWANY!"<<std::endl;
-    else if (szachowanie==2)
-        std::cout<<"BIALY KROL JEST SZACHOWANY!"<<std::endl;
     while(!(poprawny1 and poprawny2))
     {
+        if(szachowanie==1)
+            std::cout<<"CZARNY KROL JEST SZACHOWANY!"<<std::endl;
+        else if (szachowanie==2)
+            std::cout<<"BIALY KROL JEST SZACHOWANY!"<<std::endl;
         std::cout<<"wprowadz ruch(np. a4-a6, 2, o-o): ";
         std::cin>>ruch;
         poprawny1=0;
@@ -327,33 +327,7 @@ int ruch_wieza(std::string ruch,int kolor, char tab[][8])
     }
     if(docelowy_wiersz==poczatkowy_wiersz or docelowy_kolumna==poczatkowy_kolumna)
     {
-        if(kolor)
-        {
-            if(poprawny and (tab[docelowy_wiersz][docelowy_kolumna]==' ' or islower(tab[docelowy_wiersz][docelowy_kolumna])))
-            {
-                tab[docelowy_wiersz][docelowy_kolumna]=tab[poczatkowy_wiersz][poczatkowy_kolumna];
-                tab[poczatkowy_wiersz][poczatkowy_kolumna]=' ';
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
-            
-        }
-        else
-        {
-            if(poprawny and (tab[docelowy_wiersz][docelowy_kolumna]==' ' or isupper(tab[docelowy_wiersz][docelowy_kolumna])))
-            {
-                tab[docelowy_wiersz][docelowy_kolumna]=tab[poczatkowy_wiersz][poczatkowy_kolumna];
-                tab[poczatkowy_wiersz][poczatkowy_kolumna]=' ';
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
-        }
+        return ruch_figury(poprawny, kolor, docelowy_wiersz, docelowy_kolumna,poczatkowy_wiersz, poczatkowy_kolumna, tab);
     }
     else
         return 0;
@@ -382,33 +356,7 @@ int ruch_skoczek(std::string ruch,int kolor, char tab[][8])
             poprawny=true;
         }
     }
-    if(kolor)
-    {
-        if(poprawny and (tab[docelowy_wiersz][docelowy_kolumna]==' ' or islower(tab[docelowy_wiersz][docelowy_kolumna])))
-        {
-            tab[docelowy_wiersz][docelowy_kolumna]=tab[poczatkowy_wiersz][poczatkowy_kolumna];
-            tab[poczatkowy_wiersz][poczatkowy_kolumna]=' ';
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-        
-    }
-    else
-    {
-        if(poprawny and (tab[docelowy_wiersz][docelowy_kolumna]==' ' or isupper(tab[docelowy_wiersz][docelowy_kolumna])))
-        {
-            tab[docelowy_wiersz][docelowy_kolumna]=tab[poczatkowy_wiersz][poczatkowy_kolumna];
-            tab[poczatkowy_wiersz][poczatkowy_kolumna]=' ';
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
+    return ruch_figury(poprawny, kolor, docelowy_wiersz, docelowy_kolumna,poczatkowy_wiersz, poczatkowy_kolumna, tab);
     
 }
 int ruch_goniec(std::string ruch,int kolor, char tab[][8])
@@ -462,36 +410,10 @@ int ruch_goniec(std::string ruch,int kolor, char tab[][8])
     }
     if(abs(docelowy_wiersz-poczatkowy_wiersz)==abs(docelowy_kolumna-poczatkowy_kolumna))
        {
-        if(kolor)
-        {
-            if(poprawny and (tab[docelowy_wiersz][docelowy_kolumna]==' ' or islower(tab[docelowy_wiersz][docelowy_kolumna])))
-            {
-                tab[docelowy_wiersz][docelowy_kolumna]=tab[poczatkowy_wiersz][poczatkowy_kolumna];
-                tab[poczatkowy_wiersz][poczatkowy_kolumna]=' ';
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
-            
-        }
-        else
-        {
-            if(poprawny and (tab[docelowy_wiersz][docelowy_kolumna]==' ' or isupper(tab[docelowy_wiersz][docelowy_kolumna])))
-            {
-                tab[docelowy_wiersz][docelowy_kolumna]=tab[poczatkowy_wiersz][poczatkowy_kolumna];
-                tab[poczatkowy_wiersz][poczatkowy_kolumna]=' ';
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
-        }
+        return ruch_figury(poprawny, kolor, docelowy_wiersz, docelowy_kolumna,poczatkowy_wiersz, poczatkowy_kolumna, tab);
        }
-       else
-           return 0;
+    else
+        return 0;
 }
 int ruch_hetman(std::string ruch,int kolor, char tab[][8])
 {
@@ -523,32 +445,7 @@ int ruch_krol(struct ruch * &pHead, struct ruch *&pTail,std::string ruch,int kol
             poprawny=true;
         }
     }
-    if(!kolor)
-    {
-        if(poprawny and (tab[docelowy_wiersz][docelowy_kolumna]==' ' or isupper(tab[docelowy_wiersz][docelowy_kolumna])))
-        {
-            tab[docelowy_wiersz][docelowy_kolumna]=tab[poczatkowy_wiersz][poczatkowy_kolumna];
-            tab[poczatkowy_wiersz][poczatkowy_kolumna]=' ';
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-    else
-    {
-        if(poprawny and (tab[docelowy_wiersz][docelowy_kolumna]==' ' or islower(tab[docelowy_wiersz][docelowy_kolumna])))
-        {
-            tab[docelowy_wiersz][docelowy_kolumna]=tab[poczatkowy_wiersz][poczatkowy_kolumna];
-            tab[poczatkowy_wiersz][poczatkowy_kolumna]=' ';
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
+    return ruch_figury(poprawny, kolor, docelowy_wiersz, docelowy_kolumna,poczatkowy_wiersz, poczatkowy_kolumna, tab);
     
 }
 int rooszada_krotka(struct ruch * &pHead, struct ruch *&pTail,int kolor, char tab[][8])
@@ -838,4 +735,33 @@ std::string znajdz_polozenie_krola(int kolor, char tab[][8])
         }
     }
     return "0";
+}
+int ruch_figury(bool poprawny,int kolor, int docelowy_wiersz, int docelowy_kolumna, int poczatkowy_wiersz, int poczatkowy_kolumna, char tab[][8])
+{
+    if(!kolor)
+    {
+        if(poprawny and (tab[docelowy_wiersz][docelowy_kolumna]==' ' or isupper(tab[docelowy_wiersz][docelowy_kolumna])))
+        {
+            tab[docelowy_wiersz][docelowy_kolumna]=tab[poczatkowy_wiersz][poczatkowy_kolumna];
+            tab[poczatkowy_wiersz][poczatkowy_kolumna]=' ';
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    else
+    {
+        if(poprawny and (tab[docelowy_wiersz][docelowy_kolumna]==' ' or islower(tab[docelowy_wiersz][docelowy_kolumna])))
+        {
+            tab[docelowy_wiersz][docelowy_kolumna]=tab[poczatkowy_wiersz][poczatkowy_kolumna];
+            tab[poczatkowy_wiersz][poczatkowy_kolumna]=' ';
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
 }

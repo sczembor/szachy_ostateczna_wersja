@@ -153,11 +153,22 @@ int rooszada_dluga(struct ruch * &pHead, struct ruch *&pTail,int kolor, char tab
  @param tab dwuwymiarowa tablica przechowujaca aktualne pozycje figur na szachownicy
  @return zwraca wartosc typu int w zaleznosci od wyniku
  */
-int szachowanie_krola(struct ruch * & pHead, struct ruch * & pTail,int kolor, char tab[][8]); //funkcja zwraca jeden gdy krol jest szachowany
+int szachowanie_krola(struct ruch * & pHead, struct ruch * & pTail,int kolor, char tab[][8]);
 /** Funckja wyszukujaca aktualne polozenie krola przeciwnika
  @param kolor kolor gracza, ktoremu jest przyznany ruch
  @param tab dwuwymiarowa tablica przechowujaca aktualne pozycje figur na szachownicy
  @return zwraca string przechowujacy aktualne polozenie krola przeciwnika na szachownicy
  */
 std::string znajdz_polozenie_krola(int kolor, char tab[][8]);
+/** Funckja wyszukujaca aktualne polozenie krola przeciwnika
+ @param kolor kolor gracza, ktoremu jest przyznany ruch
+ @param tab dwuwymiarowa tablica przechowujaca aktualne pozycje figur na szachownicy
+ @param poprawny przymuje wartosc true jezeli ruch jest poprawny
+ @param docelowy_wiersz numer docelowego wiersza
+ @param docelowy_kolumna numer docelowej kolumny
+ @param poczatkowy_wiersz numer poczatkowego wiersza
+ @param poczatkowy_kolumna numer poczatkowej kolumny
+ @return zwraca wartosc typu int rowna 1 jezeli wykonano ruch, w przeciwnym wypadku zwraca 0 
+ */
+int ruch_figury(bool poprawny, int kolor, int docelowy_wiersz, int docelowy_kolumna, int poczatkowy_wiersz, int poczatkowy_kolumna, char tab[][8]);//funkcja wykonujaca ruch
 #endif /* funkcje_hpp */
