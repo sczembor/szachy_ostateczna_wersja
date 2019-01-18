@@ -77,9 +77,9 @@ void gra(int &koniec, struct ruch * &pHead, struct ruch *&pTail,int &kolor,char 
     int szachowanie=0;
     szachowanie = szachowanie_krola(pHead, pTail, kolor, tab);
     czyszczenie_ekranu();
-    wyswietl_szachownice(tab, 8, kolor);
     while(!(poprawny1 and poprawny2))
     {
+        wyswietl_szachownice(tab, 8, kolor);
         if(szachowanie==1)
             std::cout<<"CZARNY KROL JEST SZACHOWANY!"<<std::endl;
         else if (szachowanie==2)
@@ -147,7 +147,6 @@ void gra(int &koniec, struct ruch * &pHead, struct ruch *&pTail,int &kolor,char 
             }
         }
         czyszczenie_ekranu();
-        wyswietl_szachownice(tab, 8, kolor);
     }
 }
 int czy_poprawny_pionek(std::string ruch,int kolor,char tab[][8])
