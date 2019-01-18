@@ -18,6 +18,7 @@ void wyswietl_szachownice(char tab[][8],const int ROZMIAR, int kolor);
 /** Funckja resetujaca rozmieszczenie figur na szachownicy
  @param tab dwuwymiarowa tablica przechowujaca aktualne pozycje figur na szachownicy
  @param ROZMIAR parametr okreslajacy rozmiar tablicy
+ @param kolor kolor gracza, ktoremu jest przyznany ruch
  */
 void reset_szachownicy(char tab[][8],const int ROZMIAR);//funkcja ustawia pionki na szachownicy w pozycji poczatkowej
 /** Funkcja proszaca gracza o wprowadzenie ruchu lub pozycji z menu, wywolujaca inne funkcje sprawdzajace czy ruch jest poprawny, czy ktorys z kroli nie jest szachowany. Po poprawanie wykonanym ruchu, kolejka zostaje przekazna przeciwnikowi.
@@ -120,6 +121,7 @@ void wypisz_od_poczatku(struct ruch *pHead, std::ostream & ss);
  */
 void usun_liste(struct ruch *&pHead);
 /** Funkcja ktora wczytuje zapis parti ze strumienia i rozmieszcza pionki na szachownicy na podstawie danych z pliku
+ @param kolor kolor gracza, ktoremu jest przyznany ruch
  @param ss strumien, z ktorego zostanie wczytana partia
  @param tab dwuwymiarowa tablica przechowujaca aktualne pozycje figur na szachownicy
  */
